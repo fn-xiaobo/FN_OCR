@@ -1,0 +1,1 @@
+include ':app', ':ocr_ui', ':app2', ':app3', ':camera1', ':library', ':app4', ':camera2', ':loading_library'

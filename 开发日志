@@ -1,0 +1,60 @@
+//created at 2018/10/8 14:50
+1.app 集成了百度云识别 , 要 收费 , 同时需要联网 ,放弃
+2.app2 集成了 android 开源的图片识别库 简单识别
+3.app3 自定义相机 , 集成 google 图片文字识别库 (识别精度上有缺陷)
+
+//created at 2018/10/9 13:46
+1.引入了 CameraView  https://www.jianshu.com/p/0ac7234dcefc
+2.CameraView demo: https://github.com/google/cameraview
+3.自定义修改 CameraView: https://www.jianshu.com/p/0ac7234dcefc
+4.camera2 开发参考链接: https://blog.csdn.net/lb377463323/article/details/52740411
+4.代码备份:  com.fn.camera1.MainActivity
+
+public void TakePhoto(View view) {
+	Intent intent = new Intent(this, CustomerCameraActivity.class);
+	startActivityForResult(intent, OPEN_CAMERA);
+}
+
+@Override
+protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+	if (CustomerCameraActivity.RESULT_OK != resultCode) {
+		return;
+	}
+
+	if (OPEN_CAMERA == requestCode) {
+		String path = data.getStringExtra("data");
+		showImg(path, mImageView);
+	}
+}
+
+/**
+ * 展示图片
+ *
+ * @param path 图片路径
+ * @param img  显示图片的控件
+ */
+private void showImg(String path, ImageView img) {
+	BitmapFactory.Options option = new BitmapFactory.Options();
+	option.inJustDecodeBounds = true;   //不去真的解析图片，只是获取宽高信息
+	BitmapFactory.decodeFile(path, option);
+
+	int width = option.outWidth;
+	int height = option.outHeight;
+	Logger.myLog("宽度=" + width + "高度=" + height);
+
+	WindowManager wm = (WindowManager) this.getSystemService(WINDOW_SERVICE);
+	Point outPoint = new Point();
+	wm.getDefaultDisplay().getSize(outPoint);
+	//计算缩放比
+	int scale = 1;
+	int scalex = width / 300;
+	int scaley = height / 200;
+	scale = scalex > scaley ? scalex : scaley;
+	option.inSampleSize = scale;
+	//开始真正的解析图片
+	option.inJustDecodeBounds = false;
+	Bitmap bitmap = BitmapFactory.decodeFile(path, option);
+	Logger.myLog("缩放后的宽度=" + option.outWidth + "缩放后的高度=" + option.outHeight);
+	img.setImageBitmap(bitmap);
+}
